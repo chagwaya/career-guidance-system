@@ -33,8 +33,12 @@ import {
   Download,
   ArrowLeft,
   Eye,
+  Shield,
+  LogOut,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ProtectedRoute } from '@/components/auth/protected-route'
+import { useAuth } from '@/lib/auth-context'
 
 // Demo data for admin dashboard
 const demoStudents = [
@@ -143,9 +147,10 @@ const personalityDistribution = [
   { type: 'Conventional', count: 102, color: 'bg-muted-foreground' },
 ]
 
-export default function AdminPage() {
+function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const { user, logout } = useAuth()
 
   const filteredStudents = demoStudents.filter((student) => {
     const matchesSearch =
@@ -183,10 +188,26 @@ export default function AdminPage() {
               </div>
             </div>
           </div>
-          <Button variant="outline" className="gap-2 bg-transparent">
-            <Download className="h-4 w-4" />
-            Export Report
-          </Button>
+          <div className="flex items-center gap-3">
+            {user && (
+              <div className="hidden items-center gap-2 sm:flex">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                  <Shield className="h-4 w-4 text-primary" />
+                </div>
+                <div className="text-sm">
+                  <p className="font-medium text-foreground">{user.name}</p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                </div>
+              </div>
+            )}
+            <Button variant="outline" className="gap-2 bg-transparent">
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">Export Report</span>
+            </Button>
+            <Button variant="ghost" size="icon" onClick={logout} title="Sign Out">
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -196,6 +217,17 @@ export default function AdminPage() {
           <p className="mt-2 text-muted-foreground">
             Monitor student registrations, assessments, and system performance
           </p>
+        </div>
+
+        {/* Security Notice */}
+        <div className="mb-6 flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
+          <Shield className="h-5 w-5 text-primary mt-0.5" />
+          <div className="text-sm">
+            <p className="font-medium text-foreground">Secure Admin Session</p>
+            <p className="text-muted-foreground">
+              Your session is encrypted and will automatically expire after 30 minutes of inactivity. All admin activities are logged for security purposes.
+            </p>
+          </div>
         </div>
 
         {/* Stats Grid */}
@@ -389,5 +421,13 @@ export default function AdminPage() {
         </Card>
       </main>
     </div>
+  )
+}
+
+export default function AdminPage() {
+  return (
+    <ProtectedRoute allowedRoles={['admin']} redirectTo="/login">
+      <AdminDashboard />
+    </ProtectedRoute>
   )
 }

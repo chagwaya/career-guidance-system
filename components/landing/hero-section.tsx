@@ -28,15 +28,15 @@ export function HeroSection() {
         </p>
 
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Link href="/assessment">
+          <Link href="/register">
             <Button size="lg" className="gap-2 px-8">
-              Start Assessment
+              Get Started Free
               <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
-          <Link href="/profile">
+          <Link href="/login">
             <Button size="lg" variant="outline" className="px-8 bg-transparent">
-              Create Profile
+              Sign In
             </Button>
           </Link>
         </div>

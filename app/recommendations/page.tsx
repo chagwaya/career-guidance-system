@@ -8,11 +8,12 @@ import { useStudent } from '@/lib/student-context'
 import { calculateRecommendations } from '@/lib/career-data'
 import { CourseCard } from '@/components/recommendations/course-card'
 import { CourseFilters } from '@/components/recommendations/course-filters'
+import { ProtectedRoute } from '@/components/auth/protected-route'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { AlertCircle, ArrowRight, GraduationCap } from 'lucide-react'
 
-export default function RecommendationsPage() {
+function RecommendationsContent() {
   const { student, assessmentResult } = useStudent()
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [sortBy, setSortBy] = useState<'match' | 'name'>('match')
@@ -162,5 +163,13 @@ export default function RecommendationsPage() {
       </main>
       <Footer />
     </div>
+  )
+}
+
+export default function RecommendationsPage() {
+  return (
+    <ProtectedRoute allowedRoles={['student', 'admin']} redirectTo="/login">
+      <RecommendationsContent />
+    </ProtectedRoute>
   )
 }

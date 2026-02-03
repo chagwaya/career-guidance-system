@@ -6,9 +6,13 @@ import { Footer } from '@/components/landing/footer'
 import { ProfileForm } from '@/components/profile/profile-form'
 import { ProfileView } from '@/components/profile/profile-view'
 import { useStudent } from '@/lib/student-context'
+import { ProtectedRoute } from '@/components/auth/protected-route'
+import { useAuth } from '@/lib/auth-context'
+import { Shield } from 'lucide-react'
 
-export default function ProfilePage() {
+function ProfileContent() {
   const { student } = useStudent()
+  const { user } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
 
   return (
@@ -16,6 +20,17 @@ export default function ProfilePage() {
       <Navigation />
       <main className="px-4 py-12">
         <div className="mx-auto max-w-3xl">
+          {/* Security Notice */}
+          <div className="mb-6 flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
+            <Shield className="h-5 w-5 text-primary mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium text-foreground">Your Data is Protected</p>
+              <p className="text-muted-foreground">
+                Logged in as {user?.email}. Your profile information is securely stored and only accessible to you and authorized administrators.
+              </p>
+            </div>
+          </div>
+
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground">Student Profile</h1>
             <p className="mt-2 text-muted-foreground">
@@ -37,5 +52,13 @@ export default function ProfilePage() {
       </main>
       <Footer />
     </div>
+  )
+}
+
+export default function ProfilePage() {
+  return (
+    <ProtectedRoute allowedRoles={['student', 'admin']} redirectTo="/login">
+      <ProfileContent />
+    </ProtectedRoute>
   )
 }

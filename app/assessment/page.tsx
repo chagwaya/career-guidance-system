@@ -9,11 +9,12 @@ import { AssessmentQuiz } from '@/components/assessment/assessment-quiz'
 import { AssessmentResults } from '@/components/assessment/assessment-results'
 import { useStudent } from '@/lib/student-context'
 import { assessmentQuestions, getPersonalityType } from '@/lib/career-data'
+import { ProtectedRoute } from '@/components/auth/protected-route'
 import type { AssessmentResult } from '@/lib/types'
 
 type Stage = 'intro' | 'quiz' | 'results'
 
-export default function AssessmentPage() {
+function AssessmentContent() {
   const router = useRouter()
   const { student, assessmentResult, setAssessmentResult } = useStudent()
   const [stage, setStage] = useState<Stage>(assessmentResult ? 'results' : 'intro')
@@ -117,3 +118,5 @@ export default function AssessmentPage() {
     </div>
   )
 }
+
+export default AssessmentContent

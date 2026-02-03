@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/landing/footer'
 import { useStudent } from '@/lib/student-context'
+import { ProtectedRoute } from '@/components/auth/protected-route'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -78,7 +79,7 @@ function generateResponse(message: string, studentName: string): string {
   return `Thank you for your question, ${studentName}. Career decisions are important, and I'm here to help. Could you tell me more about your interests, favorite subjects, or the specific area you'd like to explore? This will help me give you more targeted guidance.`
 }
 
-export default function CounselorPage() {
+function CounselorContent() {
   const { student, messages, addMessage, assessmentResult } = useStudent()
   const [inputValue, setInputValue] = useState('')
   const [isTyping, setIsTyping] = useState(false)
@@ -353,3 +354,5 @@ export default function CounselorPage() {
     </div>
   )
 }
+
+export default CounselorContent
