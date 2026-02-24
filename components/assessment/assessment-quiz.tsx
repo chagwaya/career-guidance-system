@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import type { AssessmentQuestion } from '@/lib/types'
@@ -13,22 +14,61 @@ import { cn } from '@/lib/utils'
 
 interface AssessmentQuizProps {
   questions: AssessmentQuestion[]
-  answers: Record<number, string>
-  onAnswer: (questionId: number, value: string) => void
+  answers: Record<number, string[]>
+  importance: Record<number, 1 | 2 | 3>
+  onAnswer: (questionId: number, values: string[]) => void
+  onImportanceChange: (questionId: number, importance: 1 | 2 | 3) => void
   onSubmit: () => void
 }
 
 export function AssessmentQuiz({
   questions,
   answers,
+  importance,
   onAnswer,
+  onImportanceChange,
   onSubmit,
 }: AssessmentQuizProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [customAnswers, setCustomAnswers] = useState<Record<number, string>>({})
   const currentQuestion = questions[currentIndex]
+  const currentImportance = importance[currentQuestion.id] ?? 2
   const progress = ((Object.keys(answers).length) / questions.length) * 100
   const isLastQuestion = currentIndex === questions.length - 1
   const allAnswered = Object.keys(answers).length === questions.length
+  const customAnswerCount = (answers[currentQuestion.id] || []).filter(
+    (ans) => !currentQuestion.options.find((opt) => opt.value === ans)
+  ).length
+
+  const handleToggleAnswer = (value: string) => {
+    const currentAnswers = answers[currentQuestion.id] || []
+    
+    // If multipleAnswers is false or undefined, allow only single selection
+    if (!currentQuestion.multipleAnswers) {
+      onAnswer(currentQuestion.id, [value])
+    } else {
+      // Allow multiple selections
+      const newAnswers = currentAnswers.includes(value)
+        ? currentAnswers.filter((v) => v !== value)
+        : [...currentAnswers, value]
+      onAnswer(currentQuestion.id, newAnswers)
+    }
+  }
+
+  const handleCustomAnswerChange = (value: string) => {
+    setCustomAnswers({ ...customAnswers, [currentQuestion.id]: value })
+  }
+
+  const handleAddCustomAnswer = () => {
+    const customValue = customAnswers[currentQuestion.id]?.trim()
+    if (customValue) {
+      const currentAnswers = answers[currentQuestion.id] || []
+      if (!currentAnswers.includes(customValue)) {
+        onAnswer(currentQuestion.id, [...currentAnswers, customValue])
+      }
+      setCustomAnswers({ ...customAnswers, [currentQuestion.id]: '' })
+    }
+  }
 
   const getCategoryLabel = (category: string) => {
     switch (category) {
@@ -98,38 +138,151 @@ export function AssessmentQuiz({
             <Badge className={cn('font-normal', getCategoryColor(currentQuestion.category))}>
               {getCategoryLabel(currentQuestion.category)}
             </Badge>
+            {customAnswerCount > 0 && (
+              <Badge variant="secondary" className="font-normal">
+                {customAnswerCount} custom answer{customAnswerCount > 1 ? 's' : ''}
+              </Badge>
+            )}
           </div>
           <CardTitle className="mt-4 text-xl leading-relaxed text-foreground">
             {currentQuestion.question}
           </CardTitle>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {currentQuestion.multipleAnswers 
+              ? 'Select all that apply or add your own answer'
+              : 'Choose one option that best describes you'}
+          </p>
         </CardHeader>
-        <CardContent>
-          <RadioGroup
-            value={answers[currentQuestion.id] || ''}
-            onValueChange={(value) => onAnswer(currentQuestion.id, value)}
-            className="space-y-3"
-          >
-            {currentQuestion.options.map((option) => (
-              <div key={option.value}>
-                <Label
-                  htmlFor={`option-${option.value}`}
-                  className={cn(
-                    'flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors',
-                    answers[currentQuestion.id] === option.value
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:bg-muted/50'
-                  )}
-                >
-                  <RadioGroupItem
-                    value={option.value}
-                    id={`option-${option.value}`}
-                    className="shrink-0"
-                  />
-                  <span className="text-foreground">{option.text}</span>
-                </Label>
+        <CardContent className="space-y-4">
+          <div className="space-y-3">
+            {currentQuestion.options.map((option) => {
+              const isChecked = (answers[currentQuestion.id] || []).includes(option.value)
+              const isSingleAnswer = !currentQuestion.multipleAnswers
+              
+              return (
+                <div key={option.value}>
+                  <Label
+                    htmlFor={`option-${option.value}`}
+                    className={cn(
+                      'flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors',
+                      isChecked
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:bg-muted/50'
+                    )}
+                  >
+                    {isSingleAnswer ? (
+                      <input
+                        type="radio"
+                        id={`option-${option.value}`}
+                        name={`question-${currentQuestion.id}`}
+                        checked={isChecked}
+                        onChange={() => handleToggleAnswer(option.value)}
+                        className="h-4 w-4 shrink-0"
+                      />
+                    ) : (
+                      <Checkbox
+                        id={`option-${option.value}`}
+                        checked={isChecked}
+                        onCheckedChange={() => handleToggleAnswer(option.value)}
+                        className="shrink-0"
+                      />
+                    )}
+                    <span className="text-foreground">{option.text}</span>
+                  </Label>
+                </div>
+              )
+            })}
+          </div>
+
+          <div className="space-y-2 border-t border-border pt-4">
+            <Label className="text-sm font-medium">How important is this question to you?</Label>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant={currentImportance === 1 ? 'default' : 'outline'}
+                onClick={() => onImportanceChange(currentQuestion.id, 1)}
+              >
+                Low
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={currentImportance === 2 ? 'default' : 'outline'}
+                onClick={() => onImportanceChange(currentQuestion.id, 2)}
+              >
+                Medium
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={currentImportance === 3 ? 'default' : 'outline'}
+                onClick={() => onImportanceChange(currentQuestion.id, 3)}
+              >
+                High
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Higher importance gives this response more influence in your personality and recommendation scoring.
+            </p>
+          </div>
+
+          {/* Custom Answer Section */}
+          <div className="space-y-2 border-t border-border pt-4">
+            <Label htmlFor="custom-answer" className="text-sm font-medium">
+              Or add your own answer:
+            </Label>
+            <div className="flex gap-2">
+              <Input
+                id="custom-answer"
+                value={customAnswers[currentQuestion.id] || ''}
+                onChange={(e) => handleCustomAnswerChange(e.target.value)}
+                placeholder="Type your answer here..."
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    handleAddCustomAnswer()
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleAddCustomAnswer}
+                disabled={!customAnswers[currentQuestion.id]?.trim()}
+              >
+                Add
+              </Button>
+            </div>
+          </div>
+
+          {/* Display Custom Answers */}
+          {(answers[currentQuestion.id] || []).filter(
+            (ans) => !currentQuestion.options.find((opt) => opt.value === ans)
+          ).length > 0 && (
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Your custom answers:</Label>
+              <div className="flex flex-wrap gap-2">
+                {(answers[currentQuestion.id] || [])
+                  .filter((ans) => !currentQuestion.options.find((opt) => opt.value === ans))
+                  .map((customAns, index) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
+                      onClick={() => {
+                        const newAnswers = (answers[currentQuestion.id] || []).filter(
+                          (v) => v !== customAns
+                        )
+                        onAnswer(currentQuestion.id, newAnswers)
+                      }}
+                    >
+                      {customAns} ×
+                    </Badge>
+                  ))}
               </div>
-            ))}
-          </RadioGroup>
+            </div>
+          )}
         </CardContent>
       </Card>
 

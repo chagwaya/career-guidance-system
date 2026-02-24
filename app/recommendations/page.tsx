@@ -1,25 +1,59 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/landing/footer'
 import { useStudent } from '@/lib/student-context'
-import { calculateRecommendations } from '@/lib/career-data'
 import { CourseCard } from '@/components/recommendations/course-card'
 import { CourseFilters } from '@/components/recommendations/course-filters'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { AlertCircle, ArrowRight, GraduationCap } from 'lucide-react'
+import type { CareerRecommendation } from '@/lib/types'
 
 export default function RecommendationsPage() {
+  const router = useRouter()
   const { student, assessmentResult } = useStudent()
   const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [sortBy, setSortBy] = useState<'match' | 'name'>('match')
+  const [recommendations, setRecommendations] = useState<CareerRecommendation[]>([])
+  const [isChecking, setIsChecking] = useState(true)
 
-  const recommendations = useMemo(() => {
-    if (!assessmentResult) return []
-    return calculateRecommendations(assessmentResult.scores)
+  useEffect(() => {
+    const session = localStorage.getItem('student_session')
+    if (!session) {
+      router.push('/student-login')
+    } else {
+      setIsChecking(false)
+    }
+  }, [router])
+
+  useEffect(() => {
+    const loadRecommendations = async () => {
+      if (!assessmentResult) {
+        setRecommendations([])
+        return
+      }
+
+      try {
+        const response = await fetch('/api/recommendations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ scores: assessmentResult.scores }),
+        })
+
+        if (response.ok) {
+          const data: CareerRecommendation[] = await response.json()
+          setRecommendations(data)
+        }
+      } catch (error) {
+        setRecommendations([])
+      }
+    }
+
+    loadRecommendations()
   }, [assessmentResult])
 
   const filteredRecommendations = useMemo(() => {
@@ -40,6 +74,14 @@ export default function RecommendationsPage() {
     const cats = new Set(recommendations.map((r) => r.category))
     return ['all', ...Array.from(cats)]
   }, [recommendations])
+
+  if (isChecking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    )
+  }
 
   // Show different states based on profile/assessment completion
   if (!student) {
@@ -112,7 +154,7 @@ export default function RecommendationsPage() {
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-foreground">Your Course Recommendations</h1>
             <p className="mt-2 text-muted-foreground">
-              Based on your {assessmentResult.personalityType} personality type and assessment results
+              Based on your {assessmentResult.personalityType} profile and assessment results
             </p>
           </div>
 
@@ -147,7 +189,7 @@ export default function RecommendationsPage() {
               <div>
                 <h3 className="font-semibold text-foreground">Need More Guidance?</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Connect with a career counselor to discuss your options and get personalized advice
+                  Connect with a counselor to explore university, TVET, and applied pathways
                 </p>
               </div>
               <Link href="/counselor">

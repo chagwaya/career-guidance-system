@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id              String            @id @default(uuid())
+  name            String
+  email           String            @unique
+  password        String
+  school          String
+  grade           String
+  county          String
+  isKCSEGraduate  Boolean           @default(false)
+  createdAt       DateTime          @default(now())
+  subjects        SubjectGrade[]
+  assessments     AssessmentResult[]
+  messages        CounselorMessage[]
+}
+
+model SubjectGrade {
+  id        String  @id @default(uuid())
+  studentId String
+  subject   String
+  grade     String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model AssessmentResult {
+  id              String   @id @default(uuid())
+  studentId       String
+  personalityType String
+  interests       Json
+  strengths       Json
+  scores          Json
+  completedAt     DateTime @default(now())
+  student         Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model CounselorMessage {
+  id          String   @id @default(uuid())
+  studentId   String
+  message     String
+  fromStudent Boolean
+  timestamp   DateTime @default(now())
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model Admin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("counselor")
+  createdAt DateTime @default(now())
+}

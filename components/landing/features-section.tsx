@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { Brain, Target, GraduationCap, Users, BarChart3, Shield } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 
@@ -7,36 +8,42 @@ const features = [
     title: 'Personality Assessment',
     description:
       'Comprehensive assessment based on the Holland Code (RIASEC) model to identify your personality type and work preferences.',
+    bgImage: 'https://images.unsplash.com/photo-1516534775068-ba3e7458af70?w=400&auto=format&fit=crop&q=80'
   },
   {
     icon: Target,
     title: 'Interest Mapping',
     description:
       'Discover your true interests through carefully designed questions that reveal what activities and subjects motivate you.',
+    bgImage: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&auto=format&fit=crop&q=80'
   },
   {
     icon: BarChart3,
     title: 'Strength Analysis',
     description:
       'Identify your unique strengths and abilities to understand which academic and career paths suit you best.',
+    bgImage: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&auto=format&fit=crop&q=80'
   },
   {
     icon: GraduationCap,
     title: 'Course Matching',
     description:
       'Get personalized recommendations for university courses available in Kenyan institutions based on your profile.',
+    bgImage: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&auto=format&fit=crop&q=80'
   },
   {
     icon: Users,
     title: 'Counselor Support',
     description:
       'Connect with career counselors who can provide additional guidance and answer your questions.',
+    bgImage: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=400&auto=format&fit=crop&q=80'
   },
   {
     icon: Shield,
     title: 'KCSE Integration',
     description:
       'Factor in your KCSE subject performance to provide realistic course recommendations based on admission requirements.',
+    bgImage: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&auto=format&fit=crop&q=80'
   },
 ]
 
@@ -58,13 +65,25 @@ export function FeaturesSection() {
           {features.map((feature) => {
             const Icon = feature.icon
             return (
-              <Card key={feature.title} className="border-border bg-card transition-shadow hover:shadow-lg">
-                <CardContent className="p-6">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-                    <Icon className="h-6 w-6 text-primary" />
+              <Card key={feature.title} className="border-border overflow-hidden transition-shadow hover:shadow-lg group">
+                <CardContent className="p-0">
+                  <div className="relative h-48 overflow-hidden">
+                    <Image
+                      src={feature.bgImage}
+                      alt={feature.title}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-110"
+                      unoptimized
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/20" />
+                    <div className="absolute bottom-4 left-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/90 backdrop-blur-sm">
+                      <Icon className="h-6 w-6 text-primary-foreground" />
+                    </div>
                   </div>
-                  <h3 className="mb-2 text-lg font-semibold text-foreground">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground">{feature.description}</p>
+                  <div className="p-6">
+                    <h3 className="mb-2 text-lg font-semibold text-foreground">{feature.title}</h3>
+                    <p className="text-sm text-muted-foreground">{feature.description}</p>
+                  </div>
                 </CardContent>
               </Card>
             )

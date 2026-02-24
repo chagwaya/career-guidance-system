@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/landing/footer'
 import { ProfileForm } from '@/components/profile/profile-form'
@@ -8,8 +9,44 @@ import { ProfileView } from '@/components/profile/profile-view'
 import { useStudent } from '@/lib/student-context'
 
 export default function ProfilePage() {
-  const { student } = useStudent()
+  const router = useRouter()
+  const { student, setStudent } = useStudent()
   const [isEditing, setIsEditing] = useState(false)
+  const [isChecking, setIsChecking] = useState(true)
+
+  useEffect(() => {
+    const checkAuthAndFetchStudent = async () => {
+      const session = localStorage.getItem('student_session')
+      if (!session) {
+        router.push('/student-login')
+        return
+      }
+
+      try {
+        const sessionData = JSON.parse(session)
+        // Fetch full student data from API using email
+        const response = await fetch(`/api/students?email=${encodeURIComponent(sessionData.email)}`)
+        if (response.ok) {
+          const studentData = await response.json()
+          setStudent(studentData)
+        }
+      } catch (error) {
+        console.error('Error fetching student:', error)
+      } finally {
+        setIsChecking(false)
+      }
+    }
+
+    checkAuthAndFetchStudent()
+  }, [])
+
+  if (isChecking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">

@@ -118,11 +118,11 @@ export function CourseCard({ course, rank }: CourseCardProps) {
                   </ul>
                 </div>
 
-                {/* Universities */}
+                {/* Institutions */}
                 <div>
                   <h4 className="mb-3 flex items-center gap-2 font-semibold text-foreground">
                     <Building2 className="h-5 w-5 text-primary" />
-                    Available at Universities
+                    Available at Institutions
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {course.universities.map((uni) => (

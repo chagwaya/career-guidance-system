@@ -113,11 +113,16 @@ export function ProfileView({ onEdit }: ProfileViewProps) {
       <Card className="border-border bg-card">
         <CardHeader>
           <CardTitle>Academic Performance</CardTitle>
-          <CardDescription>Your KCSE subjects and grades</CardDescription>
+          <CardDescription>
+            {(student as any).isKCSEGraduate 
+              ? 'Your KCSE subjects and grades' 
+              : 'Your subjects and grades'}
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {student.subjects.map((subject, index) => (
+          {student.subjects && student.subjects.length > 0 ? (
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {student.subjects.map((subject, index) => (
               <div
                 key={index}
                 className="flex items-center justify-between rounded-lg border border-border bg-background p-3"
@@ -141,7 +146,14 @@ export function ProfileView({ onEdit }: ProfileViewProps) {
                 </Badge>
               </div>
             ))}
-          </div>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-dashed border-border p-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                No subjects added yet. Click Edit to add your subjects and grades.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 

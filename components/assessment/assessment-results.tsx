@@ -1,12 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
 import type { AssessmentResult } from '@/lib/types'
-import { personalityDescriptions } from '@/lib/career-data'
+import { personalityDescriptions, getReadableLabel, getPersonalityArchetype } from '@/lib/career-data'
 import {
   Brain,
   Target,
@@ -40,7 +40,9 @@ const scoreColors = {
 }
 
 export function AssessmentResults({ result, onRetake }: AssessmentResultsProps) {
+  const [showDetailedScores, setShowDetailedScores] = useState(false)
   const maxScore = Math.max(...Object.values(result.scores))
+  const archetype = getPersonalityArchetype(result.scores)
 
   // Sort scores to get top 3
   const sortedScores = Object.entries(result.scores)
@@ -77,21 +79,38 @@ export function AssessmentResults({ result, onRetake }: AssessmentResultsProps) 
         </CardHeader>
         <CardContent>
           <div className="rounded-lg bg-muted/50 p-4">
+            <Badge variant="secondary" className="mb-2 font-semibold">
+              {archetype.name}
+            </Badge>
             <Badge className="mb-3 bg-primary text-lg text-primary-foreground">
               {result.personalityType}
             </Badge>
+            <p className="mb-2 text-sm text-muted-foreground">{archetype.summary}</p>
             <p className="text-muted-foreground">
-              {personalityDescriptions[result.personalityType]}
+              {result.personalityType.includes('-') 
+                ? `You have a balanced profile with strengths in ${result.personalityType.split('-').join(', ')} traits. This versatile combination allows you to excel in various fields.`
+                : personalityDescriptions[result.personalityType]
+              }
             </p>
           </div>
 
           <div className="mt-6 space-y-4">
-            <h4 className="text-sm font-medium text-foreground">Your RIASEC Profile</h4>
-            {Object.entries(result.scores).map(([key, value]) => (
+            <div className="flex items-center justify-between">
+              <h4 className="text-sm font-medium text-foreground">Your RIASEC Profile</h4>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setShowDetailedScores((prev) => !prev)}
+              >
+                {showDetailedScores ? 'Hide Details' : 'Show Details'}
+              </Button>
+            </div>
+            {showDetailedScores && Object.entries(result.scores).map(([key, value]) => (
               <div key={key} className="space-y-1">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-foreground">{scoreLabels[key as keyof typeof scoreLabels]}</span>
-                  <span className="text-muted-foreground">{value} pts</span>
+                  <span className="text-muted-foreground">{Math.round(value)} pts</span>
                 </div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
@@ -155,7 +174,7 @@ export function AssessmentResults({ result, onRetake }: AssessmentResultsProps) 
               <div className="flex flex-wrap gap-2">
                 {result.interests.map((interest, index) => (
                   <Badge key={index} variant="secondary" className="font-normal">
-                    {interest}
+                    {getReadableLabel(interest)}
                   </Badge>
                 ))}
               </div>
@@ -165,7 +184,7 @@ export function AssessmentResults({ result, onRetake }: AssessmentResultsProps) 
               <div className="flex flex-wrap gap-2">
                 {result.strengths.map((strength, index) => (
                   <Badge key={index} variant="outline" className="font-normal">
-                    {strength}
+                    {getReadableLabel(strength)}
                   </Badge>
                 ))}
               </div>
@@ -180,7 +199,7 @@ export function AssessmentResults({ result, onRetake }: AssessmentResultsProps) 
           <div>
             <h3 className="font-semibold text-foreground">Ready to See Your Course Matches?</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              View personalized university course recommendations based on your assessment results
+              View personalized institution and training recommendations based on your assessment results
             </p>
           </div>
           <Link href="/recommendations">

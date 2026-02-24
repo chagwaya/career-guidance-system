@@ -35,6 +35,7 @@ export function ProfileForm({ existingStudent, onComplete }: ProfileFormProps) {
     school: existingStudent?.school || '',
     grade: existingStudent?.grade || '',
     county: existingStudent?.county || '',
+    isKCSEGraduate: (existingStudent as any)?.isKCSEGraduate || false,
   })
 
   const [subjects, setSubjects] = useState<SubjectGrade[]>(
@@ -46,6 +47,7 @@ export function ProfileForm({ existingStudent, onComplete }: ProfileFormProps) {
   )
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const addSubject = () => {
     if (subjects.length < 8) {
@@ -77,40 +79,50 @@ export function ProfileForm({ existingStudent, onComplete }: ProfileFormProps) {
     if (!formData.grade) newErrors.grade = 'Please select your class'
     if (!formData.county) newErrors.county = 'Please select your county'
 
-    // Validate at least 3 subjects with grades
-    const validSubjects = subjects.filter((s) => s.subject && s.grade)
-    if (validSubjects.length < 3) {
-      newErrors.subjects = 'Please enter at least 3 subjects with grades'
+    // Validate subjects based on KCSE graduate status
+    if (formData.isKCSEGraduate) {
+      // KCSE graduates must provide 7-8 subjects with grades
+      const validSubjects = subjects.filter((s) => s.subject && s.grade)
+      if (validSubjects.length < 7) {
+        newErrors.subjects = 'KCSE graduates must provide at least 7 subjects with grades'
+      }
+    } else {
+      // Current students must provide at least 3 subjects (grades optional)
+      const validSubjects = subjects.filter((s) => s.subject.trim())
+      if (validSubjects.length < 3) {
+        newErrors.subjects = 'Please enter at least 3 subjects'
+      }
     }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const saveStudent = async (student: Student) => {
+    const response = await fetch('/api/students', {
+      method: existingStudent ? 'PUT' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(student),
+    })
 
-    if (!validateForm()) return
-
-    const student: Student = {
-      id: existingStudent?.id || crypto.randomUUID(),
-      name: formData.name,
-      email: formData.email,
-      school: formData.school,
-      grade: formData.grade,
-      county: formData.county,
-      subjects: subjects.filter((s) => s.subject && s.grade),
-      createdAt: existingStudent?.createdAt || new Date().toISOString(),
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}))
+      throw new Error(data?.error || 'Failed to save profile')
     }
 
-    setStudent(student)
-    onComplete()
+    return (await response.json()) as Student
   }
 
-  const handleSubmitAndContinue = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!validateForm()) return
+
+    setSubmitError(null)
+
+    // Filter subjects: keep only those with subject names
+    // For non-KCSE graduates, grades can be empty
+    const filteredSubjects = subjects.filter((s) => s.subject.trim())
 
     const student: Student = {
       id: existingStudent?.id || crypto.randomUUID(),
@@ -119,12 +131,50 @@ export function ProfileForm({ existingStudent, onComplete }: ProfileFormProps) {
       school: formData.school,
       grade: formData.grade,
       county: formData.county,
-      subjects: subjects.filter((s) => s.subject && s.grade),
+      subjects: filteredSubjects,
+      isKCSEGraduate: formData.isKCSEGraduate,
       createdAt: existingStudent?.createdAt || new Date().toISOString(),
-    }
+    } as any
 
-    setStudent(student)
-    router.push('/assessment')
+    try {
+      const savedStudent = await saveStudent(student)
+      setStudent(savedStudent)
+      onComplete()
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Failed to save profile')
+    }
+  }
+
+  const handleSubmitAndContinue = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!validateForm()) return
+
+    setSubmitError(null)
+
+    // Filter subjects: keep only those with subject names
+    // For non-KCSE graduates, grades can be empty
+    const filteredSubjects = subjects.filter((s) => s.subject.trim())
+
+    const student: Student = {
+      id: existingStudent?.id || crypto.randomUUID(),
+      name: formData.name,
+      email: formData.email,
+      school: formData.school,
+      grade: formData.grade,
+      county: formData.county,
+      subjects: filteredSubjects,
+      isKCSEGraduate: formData.isKCSEGraduate,
+      createdAt: existingStudent?.createdAt || new Date().toISOString(),
+    } as any
+
+    try {
+      const savedStudent = await saveStudent(student)
+      setStudent(savedStudent)
+      router.push('/assessment')
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Failed to save profile')
+    }
   }
 
   const availableSubjects = kcseSubjects.filter(
@@ -139,6 +189,26 @@ export function ProfileForm({ existingStudent, onComplete }: ProfileFormProps) {
           <CardDescription>Enter your basic details to create your profile</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isKCSEGraduate"
+                checked={formData.isKCSEGraduate}
+                onChange={(e) => setFormData({ ...formData, isKCSEGraduate: e.target.checked })}
+                className="h-4 w-4"
+              />
+              <Label htmlFor="isKCSEGraduate" className="cursor-pointer">
+                I am a KCSE graduate
+              </Label>
+            </div>
+            {formData.isKCSEGraduate && (
+              <p className="text-sm text-muted-foreground">
+                As a KCSE graduate, you must provide at least 7 subjects with grades.
+              </p>
+            )}
+          </div>
+
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
@@ -159,8 +229,11 @@ export function ProfileForm({ existingStudent, onComplete }: ProfileFormProps) {
                 placeholder="your.email@example.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                disabled={!!existingStudent?.email}
+                className={existingStudent?.email ? "bg-muted cursor-not-allowed" : ""}
               />
               {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+              {existingStudent?.email && <p className="text-xs text-muted-foreground">Email cannot be changed</p>}
             </div>
           </div>
 
@@ -174,6 +247,10 @@ export function ProfileForm({ existingStudent, onComplete }: ProfileFormProps) {
             />
             {errors.school && <p className="text-sm text-destructive">{errors.school}</p>}
           </div>
+
+          {submitError && (
+            <p className="text-sm text-destructive">{submitError}</p>
+          )}
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
@@ -223,7 +300,9 @@ export function ProfileForm({ existingStudent, onComplete }: ProfileFormProps) {
         <CardHeader>
           <CardTitle>Academic Performance</CardTitle>
           <CardDescription>
-            Enter your KCSE subjects and grades (or expected grades for current students)
+            {formData.isKCSEGraduate 
+              ? 'Enter at least 7 KCSE subjects with your grades' 
+              : 'Enter your subjects (grades optional for current students)'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -253,9 +332,10 @@ export function ProfileForm({ existingStudent, onComplete }: ProfileFormProps) {
                 <Select
                   value={subject.grade}
                   onValueChange={(value) => updateSubject(index, 'grade', value)}
+                  disabled={!formData.isKCSEGraduate && !subject.grade}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Grade" />
+                    <SelectValue placeholder={formData.isKCSEGraduate ? "Grade*" : "Grade"} />
                   </SelectTrigger>
                   <SelectContent>
                     {grades.map((grade) => (

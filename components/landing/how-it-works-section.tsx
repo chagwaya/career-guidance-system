@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { UserPlus, ClipboardCheck, Lightbulb, MessageSquare } from 'lucide-react'
 
 const steps = [
@@ -7,6 +8,7 @@ const steps = [
     title: 'Create Your Profile',
     description:
       'Register and enter your basic information, school details, and KCSE subject grades to get started.',
+    bgImage: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&auto=format&fit=crop&q=80'
   },
   {
     step: '02',
@@ -14,6 +16,7 @@ const steps = [
     title: 'Complete Assessment',
     description:
       'Answer questions about your personality, interests, and strengths. The assessment takes about 15-20 minutes.',
+    bgImage: 'https://images.unsplash.com/photo-1517842645767-c639042777db?w=600&auto=format&fit=crop&q=80'
   },
   {
     step: '03',
@@ -21,6 +24,7 @@ const steps = [
     title: 'Get Recommendations',
     description:
       'Receive personalized course recommendations matched to your profile with detailed information about each option.',
+    bgImage: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?w=600&auto=format&fit=crop&q=80'
   },
   {
     step: '04',
@@ -28,6 +32,7 @@ const steps = [
     title: 'Consult a Counselor',
     description:
       'Connect with career counselors for additional guidance and support in making your final decision.',
+    bgImage: 'https://images.unsplash.com/photo-1573164574511-73c773193279?w=600&auto=format&fit=crop&q=80'
   },
 ]
 
@@ -60,13 +65,25 @@ export function HowItWorksSection() {
                   {/* Content */}
                   <div className={`flex-1 ${isEven ? 'md:text-right' : 'md:text-left'}`}>
                     <div
-                      className={`rounded-2xl border border-border bg-card p-6 shadow-sm ${
+                      className={`relative overflow-hidden rounded-2xl border border-border shadow-sm ${
                         isEven ? 'md:mr-6' : 'md:ml-6'
                       }`}
                     >
-                      <div className="mb-3 text-sm font-bold text-primary">Step {item.step}</div>
-                      <h3 className="mb-2 text-xl font-semibold text-foreground">{item.title}</h3>
-                      <p className="text-muted-foreground">{item.description}</p>
+                      <div className="relative h-full min-h-[200px]">
+                        <Image
+                          src={item.bgImage}
+                          alt={item.title}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/90 to-background/80" />
+                        <div className="relative p-6">
+                          <div className="mb-3 text-sm font-bold text-primary">Step {item.step}</div>
+                          <h3 className="mb-2 text-xl font-semibold text-foreground">{item.title}</h3>
+                          <p className="text-muted-foreground">{item.description}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
 

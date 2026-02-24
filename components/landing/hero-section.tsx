@@ -1,12 +1,22 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Sparkles } from 'lucide-react'
 
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden px-4 py-20 md:py-32">
-      {/* Background decoration */}
+      {/* Background image with overlay */}
       <div className="absolute inset-0 -z-10">
+        <Image
+          src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&auto=format&fit=crop&q=80"
+          alt="Students studying"
+          fill
+          className="object-cover"
+          unoptimized
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/90 to-background" />
         <div className="absolute left-1/4 top-20 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
         <div className="absolute bottom-20 right-1/4 h-72 w-72 rounded-full bg-secondary/10 blur-3xl" />
       </div>
@@ -28,15 +38,15 @@ export function HeroSection() {
         </p>
 
         <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Link href="/assessment">
+          <Link href="/student-login">
             <Button size="lg" className="gap-2 px-8">
-              Start Assessment
+              Get Started
               <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
-          <Link href="/profile">
+          <Link href="/student-login">
             <Button size="lg" variant="outline" className="px-8 bg-transparent">
-              Create Profile
+              Login / Sign Up
             </Button>
           </Link>
         </div>

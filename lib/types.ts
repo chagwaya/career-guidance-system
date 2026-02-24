@@ -6,6 +6,7 @@ export interface Student {
   grade: string
   county: string
   subjects: SubjectGrade[]
+  isKCSEGraduate?: boolean
   createdAt: string
 }
 
@@ -62,6 +63,7 @@ export interface AssessmentQuestion {
   id: number
   question: string
   category: 'personality' | 'interest' | 'strength'
+  multipleAnswers?: boolean
   options: {
     text: string
     value: string

@@ -3,6 +3,7 @@
 import React from "react"
 
 import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/landing/footer'
@@ -31,58 +32,21 @@ const suggestedQuestions = [
   'How can I improve my chances of getting a scholarship?',
 ]
 
-// Simple AI-like responses based on keywords
-function generateResponse(message: string, studentName: string): string {
-  const lowerMessage = message.toLowerCase()
-
-  if (lowerMessage.includes('mathematics') || lowerMessage.includes('math')) {
-    return `Great question, ${studentName}! If you love mathematics, you have many exciting options. Consider courses like Engineering (Civil, Mechanical, Electrical), Actuarial Science, Statistics, Computer Science, or Economics. These fields heavily utilize mathematical skills. Based on your KCSE mathematics grade, I can help narrow down the best options for you.`
-  }
-
-  if (lowerMessage.includes('computer') || lowerMessage.includes('technology') || lowerMessage.includes('programming')) {
-    return `Computer Science and IT are excellent fields with high demand in Kenya! Universities like JKUAT, University of Nairobi, and Strathmore offer strong programs. You'll need good grades in Mathematics and Physics. Career paths include Software Development, Data Science, Cybersecurity, and more.`
-  }
-
-  if (lowerMessage.includes('medicine') || lowerMessage.includes('doctor') || lowerMessage.includes('medical')) {
-    return `Medicine is a noble and rewarding career path! To pursue MBChB in Kenya, you typically need a minimum mean grade of A- with strong performance in Biology, Chemistry, and Mathematics/Physics. Top medical schools include University of Nairobi, Kenyatta University, and Moi University. The program takes 6 years plus internship.`
-  }
-
-  if (lowerMessage.includes('university of nairobi') || lowerMessage.includes('uon')) {
-    return `The University of Nairobi is Kenya's oldest and largest university. To apply, you need to register on the KUCCPS portal during the application period (usually January-April). Your KCSE grades determine which courses you qualify for. The university offers programs in Medicine, Engineering, Law, Business, Arts, and more.`
-  }
-
-  if (lowerMessage.includes('scholarship') || lowerMessage.includes('financial')) {
-    return `There are several scholarship opportunities for Kenyan students: HELB (Higher Education Loans Board), university-specific scholarships, Equity Bank Wings to Fly, Mastercard Foundation Scholars Program, and government bursaries through your local CDF office. Maintain good grades and apply early!`
-  }
-
-  if (lowerMessage.includes('engineering')) {
-    return `Engineering is a fantastic choice! Popular options include Civil, Mechanical, Electrical, and Computer Engineering. Requirements typically include a mean grade of B+ or higher with strong grades in Mathematics, Physics, and Chemistry. JKUAT, University of Nairobi, and Technical University of Kenya have excellent programs.`
-  }
-
-  if (lowerMessage.includes('business') || lowerMessage.includes('commerce') || lowerMessage.includes('accounting')) {
-    return `Business and Commerce courses open doors to many careers in Kenya's growing economy. You can pursue BCom, BBA, Economics, or Accounting. These are offered at Strathmore, UoN, KU, and many other universities. Career paths include Banking, Consulting, Entrepreneurship, and Corporate Management.`
-  }
-
-  if (lowerMessage.includes('law') || lowerMessage.includes('lawyer') || lowerMessage.includes('advocate')) {
-    return `Law is a prestigious profession in Kenya! LLB programs require a minimum of B+ mean grade with strong English. After your degree, you'll need to attend Kenya School of Law and pass Bar exams. Top law schools include UoN, KU, Strathmore, and Moi University.`
-  }
-
-  if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
-    return `Hello ${studentName}! I'm your career guidance counselor. I'm here to help you explore university courses and career paths that match your interests and abilities. What would you like to know about? Feel free to ask about specific courses, universities, requirements, or career opportunities.`
-  }
-
-  if (lowerMessage.includes('thank')) {
-    return `You're welcome, ${studentName}! I'm always here to help with your career guidance journey. Remember, choosing the right course is an important decision - take your time, do your research, and don't hesitate to ask more questions. Good luck with your future!`
-  }
-
-  return `Thank you for your question, ${studentName}. Career decisions are important, and I'm here to help. Could you tell me more about your interests, favorite subjects, or the specific area you'd like to explore? This will help me give you more targeted guidance.`
-}
-
 export default function CounselorPage() {
+  const router = useRouter()
   const { student, messages, addMessage, assessmentResult } = useStudent()
   const [inputValue, setInputValue] = useState('')
-  const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [isChecking, setIsChecking] = useState(true)
+
+  useEffect(() => {
+    const session = localStorage.getItem('student_session')
+    if (!session) {
+      router.push('/student-login')
+    } else {
+      setIsChecking(false)
+    }
+  }, [])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -96,30 +60,26 @@ export default function CounselorPage() {
     if (!message.trim() || !student) return
 
     // Add user message
-    addMessage({
+    await addMessage({
       studentId: student.id,
       message: message.trim(),
       fromStudent: true,
     })
 
     setInputValue('')
-    setIsTyping(true)
-
-    // Simulate typing delay
-    setTimeout(() => {
-      const response = generateResponse(message, student.name.split(' ')[0])
-      addMessage({
-        studentId: student.id,
-        message: response,
-        fromStudent: false,
-      })
-      setIsTyping(false)
-    }, 1500)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     handleSendMessage(inputValue)
+  }
+
+  if (isChecking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    )
   }
 
   if (!student) {
@@ -189,8 +149,9 @@ export default function CounselorPage() {
                   {messages.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-8 text-center">
                       <MessageCircle className="mb-4 h-12 w-12 text-muted-foreground/50" />
-                      <p className="text-muted-foreground">
-                        Start a conversation by asking a question about careers or courses
+                      <p className="font-medium text-foreground">Welcome to Career Counseling</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Send a message and a counselor will respond to your questions
                       </p>
                     </div>
                   )}
@@ -239,27 +200,6 @@ export default function CounselorPage() {
                     </div>
                   ))}
 
-                  {isTyping && (
-                    <div className="flex gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-                        <Bot className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <div className="rounded-2xl bg-muted px-4 py-2">
-                        <div className="flex gap-1">
-                          <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50" />
-                          <span
-                            className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50"
-                            style={{ animationDelay: '0.1s' }}
-                          />
-                          <span
-                            className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50"
-                            style={{ animationDelay: '0.2s' }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
                   <div ref={messagesEndRef} />
                 </div>
 
@@ -274,9 +214,8 @@ export default function CounselorPage() {
                       onChange={(e) => setInputValue(e.target.value)}
                       placeholder="Ask about courses, careers, or universities..."
                       className="flex-1"
-                      disabled={isTyping}
                     />
-                    <Button type="submit" disabled={!inputValue.trim() || isTyping}>
+                    <Button type="submit" disabled={!inputValue.trim()}>
                       <Send className="h-4 w-4" />
                     </Button>
                   </div>
@@ -322,8 +261,7 @@ export default function CounselorPage() {
                     <button
                       key={index}
                       onClick={() => handleSendMessage(question)}
-                      disabled={isTyping}
-                      className="w-full rounded-lg border border-border bg-background p-3 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
+                      className="w-full rounded-lg border border-border bg-background p-3 text-left text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                     >
                       {question}
                     </button>

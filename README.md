@@ -28,3 +28,46 @@ Continue building your app on:
 2. Deploy your chats from the v0 interface
 3. Changes are automatically pushed to this repository
 4. Vercel deploys the latest version from this repository
+
+## Deploy on Render
+
+This project includes a Render blueprint file: `render.yaml`.
+
+### 1) Push your latest code to GitHub
+
+Render deploys from your Git repository, so make sure your latest changes are pushed.
+
+### 2) Create a new Web Service on Render
+
+- In Render, click **New +** → **Blueprint** (recommended) or **Web Service**.
+- Select this repository.
+- If using Blueprint, Render reads `render.yaml` automatically.
+
+### 3) Required environment variable
+
+Set this in Render service settings:
+
+- `DATABASE_URL` = your hosted MySQL connection string
+
+Example format:
+
+`mysql://USER:PASSWORD@HOST:3306/DATABASE_NAME`
+
+Important:
+- Do not use local XAMPP database URL for production.
+- Use a hosted MySQL provider (e.g., Railway, PlanetScale, Aiven, or your own VPS MySQL).
+
+### 4) Build and start commands
+
+Configured in `render.yaml`:
+
+- Build: `corepack enable; pnpm install --frozen-lockfile; pnpm build`
+- Start: `pnpm start`
+
+### 5) First deploy checks
+
+After deploy succeeds:
+
+- Open `/admin/login`
+- Confirm API routes respond (`/api/admin/stats` when logged in)
+- Test student flow: profile → assessment → recommendations
