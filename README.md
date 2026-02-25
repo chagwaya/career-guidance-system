@@ -62,7 +62,7 @@ Important:
 Configured in `render.yaml`:
 
 - Build: `corepack enable; pnpm install --frozen-lockfile; pnpm prisma generate; pnpm db:push; pnpm db:seed-admin; pnpm build`
-- Start: `pnpm start`
+- Start: `pnpm db:push; pnpm db:seed-admin; pnpm start`
 
 If your service was created manually (not Blueprint), copy these same commands into Render **Build Command** and **Start Command**.
 

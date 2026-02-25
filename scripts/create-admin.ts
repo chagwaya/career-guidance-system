@@ -7,25 +7,23 @@ async function main() {
   try {
     const saltRounds = 10
 
-    // Delete existing test account to recreate a single admin-counselor login
-    await prisma.admin.deleteMany({
-      where: {
-        OR: [
-          { email: 'admin@careerpath.ke' },
-          { email: 'counselor@careerpath.ke' },
-        ],
-      },
-    })
-
-    // Create single test account for both admin + counselor responsibilities
+    // Upsert single admin-counselor account so this script is safe to rerun.
     const adminPassword = await bcryptjs.hash('admin123', saltRounds)
-    const admin = await prisma.admin.create({
-      data: {
+    const admin = await prisma.admin.upsert({
+      where: {
+        email: 'admin@careerpath.ke',
+      },
+      update: {
+        password: adminPassword,
+        name: 'Admin Counselor',
+        role: 'admin',
+      },
+      create: {
         email: 'admin@careerpath.ke',
         password: adminPassword,
         name: 'Admin Counselor',
-        role: 'admin'
-      }
+        role: 'admin',
+      },
     })
 
     console.log('✅ Admin-counselor account created:')
