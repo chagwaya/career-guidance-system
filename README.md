@@ -61,8 +61,8 @@ Important:
 
 Configured in `render.yaml`:
 
-- Build: `corepack enable; pnpm install --frozen-lockfile; pnpm build`
-- Start: `pnpm start`
+- Build: `corepack enable; pnpm install --frozen-lockfile; pnpm prisma generate; pnpm build`
+- Start: `pnpm build; pnpm start`
 
 ### 5) First deploy checks
 
