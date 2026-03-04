@@ -4,8 +4,8 @@ services:
     runtime: node
     plan: free
     autoDeploy: true
-    buildCommand: corepack enable; pnpm install --frozen-lockfile; pnpm prisma generate; pnpm test; pnpm build
-    startCommand: pnpm deploy:checks; pnpm start
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm prisma generate && NODE_ENV=test pnpm test && pnpm build
+    startCommand: pnpm deploy:checks && pnpm start
     healthCheckPath: /
     envVars:
       - key: NODE_VERSION
