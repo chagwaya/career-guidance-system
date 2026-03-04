@@ -92,11 +92,11 @@ export function AssessmentIntro({ onStart }: AssessmentIntroProps) {
           <ul className="space-y-3 text-muted-foreground">
             <li className="flex items-start gap-3">
               <Clock className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-              <span>The assessment takes approximately 15-20 minutes to complete</span>
+              <span>The assessment takes approximately 5-10 minutes to complete</span>
             </li>
             <li className="flex items-start gap-3">
               <ClipboardList className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
-              <span>There are 12 questions covering personality, interests, and strengths</span>
+              <span>There are 8 questions covering personality, interests, and strengths</span>
             </li>
             <li className="flex items-start gap-3">
               <Brain className="mt-0.5 h-5 w-5 shrink-0 text-primary" />

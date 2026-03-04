@@ -325,7 +325,7 @@ export default function AdminDashboardPage() {
 
       {/* Student Details Modal */}
       <Dialog open={!!selectedStudent} onOpenChange={() => setSelectedStudent(null)}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto max-w-2xl">
+        <DialogContent className="max-h-[90vh] overflow-y-auto max-w-4xl w-[95vw]">
           {selectedStudent && (
             <>
               <DialogHeader>
@@ -365,7 +365,7 @@ export default function AdminDashboardPage() {
                   {/* Personal Info */}
                   <div>
                     <h3 className="font-semibold mb-3">Personal Information</h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                       <div>
                         <p className="text-sm text-muted-foreground">Name</p>
                         <p className="font-medium">{selectedStudent.name}</p>
@@ -397,8 +397,12 @@ export default function AdminDashboardPage() {
                   {selectedStudent.subjects.length > 0 && (
                     <div>
                       <h3 className="font-semibold mb-3">Subject Grades</h3>
-                      <div className="grid grid-cols-2 gap-2">
-                        {selectedStudent.subjects.map((subject, idx) => (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {selectedStudent.subjects
+                          .filter((subject, idx, arr) =>
+                            arr.findIndex((s) => s.subject === subject.subject) === idx
+                          )
+                          .map((subject, idx) => (
                           <div key={idx} className="flex justify-between p-2 rounded bg-secondary/50">
                             <span className="text-sm">{subject.subject}</span>
                             <Badge>{subject.grade}</Badge>

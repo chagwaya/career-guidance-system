@@ -62,80 +62,32 @@ export const counties = [
 ]
 
 export const assessmentQuestions: AssessmentQuestion[] = [
+  // -----------------------------------------------------------------------
+  // Q1 – Personality self-identification (replaces 6 individual Likert items)
+  // Selecting a description gives 5 pts to that RIASEC trait. Students
+  // typically pick 2-3, establishing a strong baseline across all dimensions.
+  // -----------------------------------------------------------------------
   {
     id: 1,
-    question: 'I enjoy working with equipment, tools, or practical systems.',
+    question: 'Which of these descriptions best match who you are? (Select all that apply)',
     category: 'personality',
+    multipleAnswers: true,
     options: [
-      { text: 'Strongly Agree', value: 'strongly_agree', scores: { realistic: 5 } },
-      { text: 'Agree', value: 'agree', scores: { realistic: 4 } },
-      { text: 'Neutral', value: 'neutral', scores: { realistic: 3 } },
-      { text: 'Disagree', value: 'disagree', scores: { realistic: 2 } },
-      { text: 'Strongly Disagree', value: 'strongly_disagree', scores: { realistic: 1 } },
+      { text: 'I am practical and hands-on — I like fixing, building, or working with tools and systems', value: 'self_realistic', scores: { realistic: 5 } },
+      { text: 'I am curious and analytical — I enjoy research, data, and understanding how things work', value: 'self_investigative', scores: { investigative: 5 } },
+      { text: 'I am creative and expressive — I gravitate toward design, writing, art, or media', value: 'self_artistic', scores: { artistic: 5 } },
+      { text: 'I am people-oriented — I feel fulfilled when helping, teaching, or supporting others', value: 'self_social', scores: { social: 5 } },
+      { text: 'I am ambitious and persuasive — I enjoy leading, selling ideas, and creating opportunities', value: 'self_enterprising', scores: { enterprising: 5 } },
+      { text: 'I am organized and detail-focused — I thrive with planning, structure, and accuracy', value: 'self_conventional', scores: { conventional: 5 } },
     ],
   },
+  // -----------------------------------------------------------------------
+  // Q2 – Favourite subjects (interest)
+  // Directly links to academic paths; every student can answer immediately.
+  // Cross-scores two RIASEC traits per option for richer differentiation.
+  // -----------------------------------------------------------------------
   {
     id: 2,
-    question: 'I like investigating ideas, data, and complex questions deeply.',
-    category: 'personality',
-    options: [
-      { text: 'Strongly Agree', value: 'strongly_agree', scores: { investigative: 5 } },
-      { text: 'Agree', value: 'agree', scores: { investigative: 4 } },
-      { text: 'Neutral', value: 'neutral', scores: { investigative: 3 } },
-      { text: 'Disagree', value: 'disagree', scores: { investigative: 2 } },
-      { text: 'Strongly Disagree', value: 'strongly_disagree', scores: { investigative: 1 } },
-    ],
-  },
-  {
-    id: 3,
-    question: 'I naturally express myself through design, writing, media, or creativity.',
-    category: 'personality',
-    options: [
-      { text: 'Strongly Agree', value: 'strongly_agree', scores: { artistic: 5 } },
-      { text: 'Agree', value: 'agree', scores: { artistic: 4 } },
-      { text: 'Neutral', value: 'neutral', scores: { artistic: 3 } },
-      { text: 'Disagree', value: 'disagree', scores: { artistic: 2 } },
-      { text: 'Strongly Disagree', value: 'strongly_disagree', scores: { artistic: 1 } },
-    ],
-  },
-  {
-    id: 4,
-    question: 'I feel motivated when serving, mentoring, or supporting other people.',
-    category: 'personality',
-    options: [
-      { text: 'Strongly Agree', value: 'strongly_agree', scores: { social: 5 } },
-      { text: 'Agree', value: 'agree', scores: { social: 4 } },
-      { text: 'Neutral', value: 'neutral', scores: { social: 3 } },
-      { text: 'Disagree', value: 'disagree', scores: { social: 2 } },
-      { text: 'Strongly Disagree', value: 'strongly_disagree', scores: { social: 1 } },
-    ],
-  },
-  {
-    id: 5,
-    question: 'I enjoy leading initiatives, persuading others, and building opportunities.',
-    category: 'personality',
-    options: [
-      { text: 'Strongly Agree', value: 'strongly_agree', scores: { enterprising: 5 } },
-      { text: 'Agree', value: 'agree', scores: { enterprising: 4 } },
-      { text: 'Neutral', value: 'neutral', scores: { enterprising: 3 } },
-      { text: 'Disagree', value: 'disagree', scores: { enterprising: 2 } },
-      { text: 'Strongly Disagree', value: 'strongly_disagree', scores: { enterprising: 1 } },
-    ],
-  },
-  {
-    id: 6,
-    question: 'I prefer structured workflows, planning, and accurate records.',
-    category: 'personality',
-    options: [
-      { text: 'Strongly Agree', value: 'strongly_agree', scores: { conventional: 5 } },
-      { text: 'Agree', value: 'agree', scores: { conventional: 4 } },
-      { text: 'Neutral', value: 'neutral', scores: { conventional: 3 } },
-      { text: 'Disagree', value: 'disagree', scores: { conventional: 2 } },
-      { text: 'Strongly Disagree', value: 'strongly_disagree', scores: { conventional: 1 } },
-    ],
-  },
-  {
-    id: 7,
     question: 'Which subjects or learning areas do you enjoy most? (Select all that apply)',
     category: 'interest',
     multipleAnswers: true,
@@ -150,9 +102,14 @@ export const assessmentQuestions: AssessmentQuestion[] = [
       { text: 'Art, design, music, film, or drama', value: 'creative_arts', scores: { artistic: 4 } },
     ],
   },
+  // -----------------------------------------------------------------------
+  // Q3 – Real-world problems to solve (interest)
+  // Motivation-based: what a student cares about is one of the strongest
+  // predictors of long-term career satisfaction.
+  // -----------------------------------------------------------------------
   {
-    id: 8,
-    question: 'Which real-world problems would you most like to solve? (Select all that apply)',
+    id: 3,
+    question: 'Which real-world problems would you most like to help solve? (Select all that apply)',
     category: 'interest',
     multipleAnswers: true,
     options: [
@@ -165,8 +122,13 @@ export const assessmentQuestions: AssessmentQuestion[] = [
       { text: 'Creating content, culture, and digital experiences', value: 'problem_media', scores: { artistic: 3, enterprising: 1 } },
     ],
   },
+  // -----------------------------------------------------------------------
+  // Q4 – Energizing tasks (interest)
+  // Core RIASEC question: what activities you enjoy is the foundation of
+  // Holland's theory.  Each option scores 3-4 pts on a primary trait.
+  // -----------------------------------------------------------------------
   {
-    id: 9,
+    id: 4,
     question: 'What type of tasks energize you most? (Select all that apply)',
     category: 'interest',
     multipleAnswers: true,
@@ -180,8 +142,13 @@ export const assessmentQuestions: AssessmentQuestion[] = [
       { text: 'Fieldwork, travel, and outdoor assignments', value: 'task_fieldwork', scores: { realistic: 3, social: 1 } },
     ],
   },
+  // -----------------------------------------------------------------------
+  // Q5 – Preferred work environments (interest)
+  // Environment preference predicts career satisfaction strongly and maps
+  // cleanly onto RIASEC types (e.g. factories → Realistic, studios → Artistic).
+  // -----------------------------------------------------------------------
   {
-    id: 10,
+    id: 5,
     question: 'Which environments do you see yourself thriving in? (Select all that apply)',
     category: 'interest',
     multipleAnswers: true,
@@ -196,8 +163,13 @@ export const assessmentQuestions: AssessmentQuestion[] = [
       { text: 'Farms, conservation sites, marine, or wildlife settings', value: 'env_nature', scores: { realistic: 3, investigative: 1 } },
     ],
   },
+  // -----------------------------------------------------------------------
+  // Q6 – Co-curricular activities (interest)
+  // Highly relatable for high school students — they already participate
+  // in these.  Gives concrete behavioural evidence behind the self-reports.
+  // -----------------------------------------------------------------------
   {
-    id: 11,
+    id: 6,
     question: 'Which co-curricular activities feel most natural to you? (Select all that apply)',
     category: 'interest',
     multipleAnswers: true,
@@ -211,23 +183,13 @@ export const assessmentQuestions: AssessmentQuestion[] = [
       { text: 'Organizing events and keeping records/logistics', value: 'club_admin', scores: { conventional: 4 } },
     ],
   },
+  // -----------------------------------------------------------------------
+  // Q7 – Trusted strengths (strength)
+  // Self-assessed capability with 4 pts per RIASEC trait — the highest
+  // weighted single-option scores, making this very discriminating.
+  // -----------------------------------------------------------------------
   {
-    id: 12,
-    question: 'What kind of digital content do you consume most? (Select all that apply)',
-    category: 'interest',
-    multipleAnswers: true,
-    options: [
-      { text: 'Science explainers, medical channels, or documentaries', value: 'content_science', scores: { investigative: 3 } },
-      { text: 'Business strategy, finance, and entrepreneurship content', value: 'content_business', scores: { enterprising: 3, conventional: 1 } },
-      { text: 'Design, fashion, film, or creative tutorials', value: 'content_creative', scores: { artistic: 3 } },
-      { text: 'Legal affairs, policy analysis, and current affairs', value: 'content_law', scores: { social: 2, investigative: 2 } },
-      { text: 'Engineering builds, gadgets, or DIY projects', value: 'content_engineering', scores: { realistic: 3, investigative: 1 } },
-      { text: 'Education, motivation, and self-development channels', value: 'content_education', scores: { social: 2, enterprising: 1 } },
-      { text: 'Travel, hospitality, food, and culture experiences', value: 'content_hospitality', scores: { social: 2, artistic: 1, enterprising: 1 } },
-    ],
-  },
-  {
-    id: 13,
+    id: 7,
     question: 'People trust you most for which strengths? (Select all that apply)',
     category: 'strength',
     multipleAnswers: true,
@@ -240,50 +202,13 @@ export const assessmentQuestions: AssessmentQuestion[] = [
       { text: 'Technical/hands-on troubleshooting', value: 'strength_technical', scores: { realistic: 4 } },
     ],
   },
+  // -----------------------------------------------------------------------
+  // Q8 – Aspirational legacy (strength)
+  // Forward-looking: what a student wants to be known for reveals intrinsic
+  // motivation and long-term fit better than backward-looking questions.
+  // -----------------------------------------------------------------------
   {
-    id: 14,
-    question: 'In projects, where do you usually contribute best? (Select all that apply)',
-    category: 'strength',
-    multipleAnswers: true,
-    options: [
-      { text: 'Data collection, analysis, and evidence-based decisions', value: 'project_data', scores: { investigative: 3, conventional: 1 } },
-      { text: 'Visual design, branding, and storytelling', value: 'project_design', scores: { artistic: 3, enterprising: 1 } },
-      { text: 'Planning schedules, budgets, and risk management', value: 'project_planning', scores: { conventional: 4 } },
-      { text: 'Coordinating people and conflict resolution', value: 'project_people', scores: { social: 3, enterprising: 1 } },
-      { text: 'Building, testing, and practical implementation', value: 'project_implementation', scores: { realistic: 3, investigative: 1 } },
-      { text: 'Pitching ideas and presenting to audiences', value: 'project_presentation', scores: { enterprising: 3, social: 1 } },
-    ],
-  },
-  {
-    id: 15,
-    question: 'Which of these tasks do you perform with confidence? (Select all that apply)',
-    category: 'strength',
-    multipleAnswers: true,
-    options: [
-      { text: 'Interpreting scientific findings and reports', value: 'conf_science', scores: { investigative: 3 } },
-      { text: 'Writing persuasive arguments and policy briefs', value: 'conf_policy', scores: { social: 2, enterprising: 2 } },
-      { text: 'Designing digital products, media, or campaigns', value: 'conf_digital', scores: { artistic: 3, investigative: 1 } },
-      { text: 'Managing customer/client experiences professionally', value: 'conf_service', scores: { social: 2, conventional: 1, enterprising: 1 } },
-      { text: 'Managing financial records and resource allocation', value: 'conf_finance', scores: { conventional: 3, enterprising: 1 } },
-      { text: 'Using tools, machinery, or lab equipment safely', value: 'conf_tools', scores: { realistic: 3 } },
-    ],
-  },
-  {
-    id: 16,
-    question: 'When learning new content, what helps you master it fastest? (Select all that apply)',
-    category: 'strength',
-    multipleAnswers: true,
-    options: [
-      { text: 'Case studies, research papers, and evidence', value: 'learn_research', scores: { investigative: 3 } },
-      { text: 'Practical demonstrations and hands-on practice', value: 'learn_hands_on', scores: { realistic: 3 } },
-      { text: 'Role play, collaboration, and discussion', value: 'learn_collab', scores: { social: 3 } },
-      { text: 'Templates, structure, and repeatable systems', value: 'learn_structure', scores: { conventional: 3 } },
-      { text: 'Creative exploration and open-ended tasks', value: 'learn_creative', scores: { artistic: 3 } },
-      { text: 'Competitions, challenges, and goal targets', value: 'learn_competition', scores: { enterprising: 3 } },
-    ],
-  },
-  {
-    id: 17,
+    id: 8,
     question: 'What do you want people to remember your work for? (Select all that apply)',
     category: 'strength',
     multipleAnswers: true,
@@ -294,20 +219,6 @@ export const assessmentQuestions: AssessmentQuestion[] = [
       { text: 'Business value and sustainable growth', value: 'legacy_growth', scores: { enterprising: 3 } },
       { text: 'Strong systems and practical infrastructure', value: 'legacy_systems', scores: { realistic: 3 } },
       { text: 'Creative excellence and memorable experiences', value: 'legacy_creative', scores: { artistic: 3 } },
-    ],
-  },
-  {
-    id: 18,
-    question: 'Which capabilities do you want to build further in higher education/training? (Select all that apply)',
-    category: 'strength',
-    multipleAnswers: true,
-    options: [
-      { text: 'Clinical, counseling, or public health practice', value: 'grow_health', scores: { social: 2, investigative: 1 } },
-      { text: 'Engineering, systems design, and problem solving', value: 'grow_engineering', scores: { realistic: 2, investigative: 1 } },
-      { text: 'Entrepreneurship, management, and leadership', value: 'grow_leadership', scores: { enterprising: 3 } },
-      { text: 'Teaching, facilitation, and curriculum delivery', value: 'grow_teaching', scores: { social: 2, conventional: 1 } },
-      { text: 'Creative direction, media, and digital communication', value: 'grow_media', scores: { artistic: 3 } },
-      { text: 'Law, governance, compliance, and administration', value: 'grow_governance', scores: { conventional: 2, social: 1 } },
     ],
   },
 ]

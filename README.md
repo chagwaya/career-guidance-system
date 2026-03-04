@@ -10,7 +10,7 @@ Built with **Next.js 16**, **React 19**, **Prisma** (MySQL), **shadcn/ui**, and 
 
 - **Student authentication** — register, login, password hashing (bcrypt)
 - **Profile management** — school, county, KCSE subjects & grades
-- **RIASEC assessment** — 18 questions across personality, interests, and strengths with importance weighting and custom answers
+- **RIASEC assessment** — 8 focused questions across personality, interests, and strengths with importance weighting and custom answers
 - **Course recommendations** — 50 courses matched to RIASEC scores, filterable by category
 - **Counselor messaging** — two-way messaging between students and admin counselors
 - **Admin dashboard** — view all students, stats, and respond to messages (auth-protected API)
