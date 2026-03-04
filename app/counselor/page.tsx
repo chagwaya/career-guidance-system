@@ -134,10 +134,10 @@ export default function CounselorPage() {
                     <Bot className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <CardTitle className="text-base">Career Guidance Assistant</CardTitle>
+                    <CardTitle className="text-base">Career Counselor</CardTitle>
                     <CardDescription className="flex items-center gap-1">
                       <span className="h-2 w-2 rounded-full bg-green-500" />
-                      Online
+                      Available
                     </CardDescription>
                   </div>
                 </div>
@@ -277,7 +277,7 @@ export default function CounselorPage() {
                     <div className="text-sm">
                       <p className="font-medium text-foreground">Response Time</p>
                       <p className="text-muted-foreground">
-                        Our AI assistant responds instantly. For complex queries, consider consulting a human counselor at your school.
+                        Messages are reviewed by a career counselor who will reply with personalized guidance.
                       </p>
                     </div>
                   </div>

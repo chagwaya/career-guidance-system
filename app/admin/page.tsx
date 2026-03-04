@@ -83,14 +83,19 @@ export default function AdminDashboardPage() {
 
     const adminData = JSON.parse(session)
     setAdmin(adminData)
-    loadData()
+    loadData(adminData.email)
   }, [router])
 
-  const loadData = async () => {
+  const loadData = async (email?: string) => {
+    const adminEmail = email || admin?.email
+    if (!adminEmail) return
+
+    const headers = { 'x-admin-email': adminEmail }
+
     try {
       const [studentsRes, statsRes] = await Promise.all([
-        fetch('/api/admin/students'),
-        fetch('/api/admin/stats'),
+        fetch('/api/admin/students', { headers }),
+        fetch('/api/admin/stats', { headers }),
       ])
 
       if (studentsRes.ok) {
@@ -112,7 +117,6 @@ export default function AdminDashboardPage() {
   const handleViewStudent = async (student: AdminStudent) => {
     setSelectedStudent(student)
     setActiveTab('overview')
-    // Fetch messages for this student
     try {
       const res = await fetch(`/api/messages?studentId=${student.id}`)
       if (res.ok) {
@@ -470,7 +474,7 @@ export default function AdminDashboardPage() {
                       placeholder="Type your reply..."
                       value={replyMessage}
                       onChange={(e) => setReplyMessage(e.target.value)}
-                      onKeyPress={(e) => {
+                      onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           handleSendReply()
                         }

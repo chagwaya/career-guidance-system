@@ -114,7 +114,7 @@ export function ProfileView({ onEdit }: ProfileViewProps) {
         <CardHeader>
           <CardTitle>Academic Performance</CardTitle>
           <CardDescription>
-            {(student as any).isKCSEGraduate 
+            {student.isKCSEGraduate 
               ? 'Your KCSE subjects and grades' 
               : 'Your subjects and grades'}
           </CardDescription>

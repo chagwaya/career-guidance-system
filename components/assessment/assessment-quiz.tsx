@@ -36,9 +36,12 @@ export function AssessmentQuiz({
   const progress = ((Object.keys(answers).length) / questions.length) * 100
   const isLastQuestion = currentIndex === questions.length - 1
   const allAnswered = Object.keys(answers).length === questions.length
-  const customAnswerCount = (answers[currentQuestion.id] || []).filter(
-    (ans) => !currentQuestion.options.find((opt) => opt.value === ans)
-  ).length
+  const currentAnswerValues = answers[currentQuestion.id] || []
+  const getCustomAnswers = (questionId: number) =>
+    (answers[questionId] || []).filter(
+      (ans) => !questions.find((q) => q.id === questionId)?.options.find((opt) => opt.value === ans)
+    )
+  const customAnswerCount = getCustomAnswers(currentQuestion.id).length
 
   const handleToggleAnswer = (value: string) => {
     const currentAnswers = answers[currentQuestion.id] || []
@@ -257,14 +260,11 @@ export function AssessmentQuiz({
           </div>
 
           {/* Display Custom Answers */}
-          {(answers[currentQuestion.id] || []).filter(
-            (ans) => !currentQuestion.options.find((opt) => opt.value === ans)
-          ).length > 0 && (
+          {getCustomAnswers(currentQuestion.id).length > 0 && (
             <div className="space-y-2">
               <Label className="text-sm font-medium">Your custom answers:</Label>
               <div className="flex flex-wrap gap-2">
-                {(answers[currentQuestion.id] || [])
-                  .filter((ans) => !currentQuestion.options.find((opt) => opt.value === ans))
+                {getCustomAnswers(currentQuestion.id)
                   .map((customAns, index) => (
                     <Badge
                       key={index}

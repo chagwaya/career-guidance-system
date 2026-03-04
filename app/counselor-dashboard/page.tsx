@@ -52,12 +52,17 @@ export default function CounselorDashboardPage() {
 
     const adminData = JSON.parse(session)
     setAdmin(adminData)
-    loadMessages()
+    loadMessages(adminData.email)
   }, [router])
 
-  const loadMessages = async () => {
+  const loadMessages = async (email?: string) => {
+    const adminEmail = email || admin?.email
+    if (!adminEmail) return
+
     try {
-      const response = await fetch('/api/admin/messages')
+      const response = await fetch('/api/admin/messages', {
+        headers: { 'x-admin-email': adminEmail },
+      })
       if (response.ok) {
         const data = await response.json()
         setMessageGroups(data)

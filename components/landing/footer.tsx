@@ -35,7 +35,7 @@ export function Footer() {
         <div className="mt-8 border-t border-border pt-8 text-center text-sm text-muted-foreground">
           <p>Digital Career Guidance System for Kenyan High School Students</p>
           <p className="mt-2">
-            Helping students make informed academic and career choices since 2024
+            &copy; {new Date().getFullYear()} CareerPath Kenya. All rights reserved.
           </p>
         </div>
       </div>

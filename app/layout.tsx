@@ -1,13 +1,11 @@
 import React from "react"
 import type { Metadata } from 'next'
-import { Analytics } from '@vercel/analytics/next'
 import { StudentProvider } from '@/lib/student-context'
 import './globals.css'
 
 export const metadata: Metadata = {
   title: 'CareerPath Kenya - Digital Career Guidance System',
   description: 'Helping Kenyan high school students discover university courses aligned with their interests, strengths, and career goals.',
-  generator: 'v0.app',
   icons: {
     icon: [
       {
@@ -38,7 +36,6 @@ export default function RootLayout({
         <StudentProvider>
           {children}
         </StudentProvider>
-        <Analytics />
       </body>
     </html>
   )

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { hashPassword } from '@/lib/password'
 
 export const runtime = 'nodejs'
 
@@ -31,66 +30,16 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
-    const { name, email, password, school, grade, county, subjects, isKCSEGraduate } = body
-
-    if (!name || !email || !school || !grade || !county) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-    }
-
-    // Check if email already exists
-    const existingStudent = await prisma.student.findUnique({
-      where: { email }
-    })
-
-    if (existingStudent) {
-      return NextResponse.json({ error: 'Email already registered' }, { status: 400 })
-    }
-
-    // Hash password if provided, otherwise generate a temporary one
-    const hashedPassword = password ? await hashPassword(password) : await hashPassword('temp_' + Date.now())
-
-    const student = await prisma.student.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        school,
-        grade,
-        county,
-        isKCSEGraduate: isKCSEGraduate || false,
-        subjects: {
-          create: Array.isArray(subjects)
-            ? subjects.map((s) => ({ 
-                subject: s.subject || '', 
-                grade: s.grade || '' 
-              }))
-            : [],
-        },
-      },
-      include: { subjects: true },
-    })
-
-    const { password: _, ...studentData } = student
-    return NextResponse.json(studentData, { status: 201 })
-  } catch (error) {
-    console.error('Failed to create student:', error)
-    return NextResponse.json({ error: 'Failed to create student' }, { status: 500 })
-  }
-}
-
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
-    const { id, name, email, password, school, grade, county, subjects, isKCSEGraduate } = body
+    const { id, name, email, school, grade, county, subjects, isKCSEGraduate } = body
 
     if (!id) {
       return NextResponse.json({ error: 'Missing id' }, { status: 400 })
     }
 
-    const updateData: any = {
+    const updateData: Record<string, unknown> = {
       name,
       email,
       school,
@@ -98,14 +47,8 @@ export async function PUT(request: NextRequest) {
       county,
     }
 
-    // Update isKCSEGraduate if provided
     if (typeof isKCSEGraduate === 'boolean') {
       updateData.isKCSEGraduate = isKCSEGraduate
-    }
-
-    // Hash new password if provided
-    if (password) {
-      updateData.password = await hashPassword(password)
     }
 
     const updated = await prisma.student.update({
@@ -115,9 +58,9 @@ export async function PUT(request: NextRequest) {
         subjects: {
           deleteMany: {},
           create: Array.isArray(subjects)
-            ? subjects.map((s) => ({ 
-                subject: s.subject || '', 
-                grade: s.grade || '' 
+            ? subjects.map((s: { subject?: string; grade?: string }) => ({
+                subject: s.subject || '',
+                grade: s.grade || '',
               }))
             : [],
         },

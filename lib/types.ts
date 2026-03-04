@@ -6,7 +6,7 @@ export interface Student {
   grade: string
   county: string
   subjects: SubjectGrade[]
-  isKCSEGraduate?: boolean
+  isKCSEGraduate: boolean
   createdAt: string
 }
 

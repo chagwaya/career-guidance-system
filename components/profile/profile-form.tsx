@@ -1,8 +1,6 @@
 'use client'
 
-import React from "react"
-
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -35,7 +33,7 @@ export function ProfileForm({ existingStudent, onComplete }: ProfileFormProps) {
     school: existingStudent?.school || '',
     grade: existingStudent?.grade || '',
     county: existingStudent?.county || '',
-    isKCSEGraduate: (existingStudent as any)?.isKCSEGraduate || false,
+    isKCSEGraduate: existingStudent?.isKCSEGraduate ?? false,
   })
 
   const [subjects, setSubjects] = useState<SubjectGrade[]>(
@@ -100,7 +98,7 @@ export function ProfileForm({ existingStudent, onComplete }: ProfileFormProps) {
 
   const saveStudent = async (student: Student) => {
     const response = await fetch('/api/students', {
-      method: existingStudent ? 'PUT' : 'POST',
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(student),
     })
@@ -113,15 +111,11 @@ export function ProfileForm({ existingStudent, onComplete }: ProfileFormProps) {
     return (await response.json()) as Student
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+  const submitForm = async (onSuccess: (saved: Student) => void) => {
     if (!validateForm()) return
 
     setSubmitError(null)
 
-    // Filter subjects: keep only those with subject names
-    // For non-KCSE graduates, grades can be empty
     const filteredSubjects = subjects.filter((s) => s.subject.trim())
 
     const student: Student = {
@@ -134,47 +128,25 @@ export function ProfileForm({ existingStudent, onComplete }: ProfileFormProps) {
       subjects: filteredSubjects,
       isKCSEGraduate: formData.isKCSEGraduate,
       createdAt: existingStudent?.createdAt || new Date().toISOString(),
-    } as any
+    }
 
     try {
       const savedStudent = await saveStudent(student)
       setStudent(savedStudent)
-      onComplete()
+      onSuccess(savedStudent)
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Failed to save profile')
     }
   }
 
-  const handleSubmitAndContinue = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    await submitForm(() => onComplete())
+  }
 
-    if (!validateForm()) return
-
-    setSubmitError(null)
-
-    // Filter subjects: keep only those with subject names
-    // For non-KCSE graduates, grades can be empty
-    const filteredSubjects = subjects.filter((s) => s.subject.trim())
-
-    const student: Student = {
-      id: existingStudent?.id || crypto.randomUUID(),
-      name: formData.name,
-      email: formData.email,
-      school: formData.school,
-      grade: formData.grade,
-      county: formData.county,
-      subjects: filteredSubjects,
-      isKCSEGraduate: formData.isKCSEGraduate,
-      createdAt: existingStudent?.createdAt || new Date().toISOString(),
-    } as any
-
-    try {
-      const savedStudent = await saveStudent(student)
-      setStudent(savedStudent)
-      router.push('/assessment')
-    } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Failed to save profile')
-    }
+  const handleSubmitAndContinue = async (e: FormEvent) => {
+    e.preventDefault()
+    await submitForm(() => router.push('/assessment'))
   }
 
   const availableSubjects = kcseSubjects.filter(

@@ -31,14 +31,13 @@ export function CourseCard({ course, rank }: CourseCardProps) {
   }
 
   const getRankBadge = (rank: number) => {
-    if (rank === 1) return 'bg-yellow-500/20 text-yellow-700 border-yellow-500/30'
-    if (rank === 2) return 'bg-gray-300/30 text-gray-700 border-gray-400/30'
-    if (rank === 3) return 'bg-orange-400/20 text-orange-700 border-orange-400/30'
+    if (rank === 1) return 'bg-primary/20 text-primary border-primary/30'
+    if (rank === 2) return 'bg-muted text-muted-foreground border-border'
+    if (rank === 3) return 'bg-secondary/20 text-secondary border-secondary/30'
     return ''
   }
 
   return (
-    <>
       <Card className="group relative border-border bg-card transition-shadow hover:shadow-lg">
         {rank <= 3 && (
           <div className="absolute -right-2 -top-2 z-10">
@@ -152,6 +151,5 @@ export function CourseCard({ course, rank }: CourseCardProps) {
           </Dialog>
         </CardContent>
       </Card>
-    </>
   )
 }
