@@ -31,6 +31,7 @@ export function AssessmentQuiz({
 }: AssessmentQuizProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [customAnswers, setCustomAnswers] = useState<Record<number, string>>({})
+  const [showCustomInput, setShowCustomInput] = useState<Record<number, boolean>>({})
   const currentQuestion = questions[currentIndex]
   const currentImportance = importance[currentQuestion.id] ?? 2
   const progress = ((Object.keys(answers).length) / questions.length) * 100
@@ -42,6 +43,9 @@ export function AssessmentQuiz({
       (ans) => !questions.find((q) => q.id === questionId)?.options.find((opt) => opt.value === ans)
     )
   const customAnswerCount = getCustomAnswers(currentQuestion.id).length
+
+  // Auto-show custom input when navigating back to a question that already has custom answers
+  const isCustomInputVisible = showCustomInput[currentQuestion.id] || customAnswerCount > 0
 
   const handleToggleAnswer = (value: string) => {
     const currentAnswers = answers[currentQuestion.id] || []
@@ -152,7 +156,7 @@ export function AssessmentQuiz({
           </CardTitle>
           <p className="mt-2 text-sm text-muted-foreground">
             {currentQuestion.multipleAnswers 
-              ? 'Select all that apply or add your own answer'
+              ? 'Select all that apply'
               : 'Choose one option that best describes you'}
           </p>
         </CardHeader>
@@ -179,7 +183,10 @@ export function AssessmentQuiz({
                         id={`option-${option.value}`}
                         name={`question-${currentQuestion.id}`}
                         checked={isChecked}
-                        onChange={() => handleToggleAnswer(option.value)}
+                        onChange={() => {
+                          setShowCustomInput({ ...showCustomInput, [currentQuestion.id]: false })
+                          handleToggleAnswer(option.value)
+                        }}
                         className="h-4 w-4 shrink-0"
                       />
                     ) : (
@@ -195,6 +202,29 @@ export function AssessmentQuiz({
                 </div>
               )
             })}
+
+            {/* None of the above — reveals custom answer input */}
+            <div>
+              <Label
+                htmlFor={`option-none-of-above-${currentQuestion.id}`}
+                className={cn(
+                  'flex cursor-pointer items-center gap-3 rounded-lg border border-dashed p-4 transition-colors',
+                  isCustomInputVisible
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:bg-muted/50'
+                )}
+              >
+                <Checkbox
+                  id={`option-none-of-above-${currentQuestion.id}`}
+                  checked={isCustomInputVisible}
+                  onCheckedChange={(checked) => {
+                    setShowCustomInput({ ...showCustomInput, [currentQuestion.id]: !!checked })
+                  }}
+                  className="shrink-0"
+                />
+                <span className="text-foreground">None of the above — I&apos;ll type my own answer</span>
+              </Label>
+            </div>
           </div>
 
           <div className="space-y-2 border-t border-border pt-4">
@@ -230,34 +260,36 @@ export function AssessmentQuiz({
             </p>
           </div>
 
-          {/* Custom Answer Section */}
-          <div className="space-y-2 border-t border-border pt-4">
-            <Label htmlFor="custom-answer" className="text-sm font-medium">
-              Or add your own answer:
-            </Label>
-            <div className="flex gap-2">
-              <Input
-                id="custom-answer"
-                value={customAnswers[currentQuestion.id] || ''}
-                onChange={(e) => handleCustomAnswerChange(e.target.value)}
-                placeholder="Type your answer here..."
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleAddCustomAnswer()
-                  }
-                }}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleAddCustomAnswer}
-                disabled={!customAnswers[currentQuestion.id]?.trim()}
-              >
-                Add
-              </Button>
+          {/* Custom Answer Section — only shown when "None of the above" is checked */}
+          {isCustomInputVisible && (
+            <div className="space-y-2 border-t border-border pt-4">
+              <Label htmlFor="custom-answer" className="text-sm font-medium">
+                Add your own answer:
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  id="custom-answer"
+                  value={customAnswers[currentQuestion.id] || ''}
+                  onChange={(e) => handleCustomAnswerChange(e.target.value)}
+                  placeholder="Type your answer here..."
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleAddCustomAnswer()
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleAddCustomAnswer}
+                  disabled={!customAnswers[currentQuestion.id]?.trim()}
+                >
+                  Add
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Display Custom Answers */}
           {getCustomAnswers(currentQuestion.id).length > 0 && (
