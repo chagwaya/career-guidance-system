@@ -18,10 +18,13 @@ export function createMockRequest(url: string, opts: RequestOptions = {}): NextR
     Object.entries(searchParams).forEach(([k, v]) => base.searchParams.set(k, v))
   }
 
-  const init: RequestInit = { method, headers }
+  const init: { method: string; headers: Record<string, string>; body?: string } = {
+    method,
+    headers: { ...headers },
+  }
   if (body !== undefined) {
     init.body = JSON.stringify(body)
-    ;(init.headers as Record<string, string>)['Content-Type'] = 'application/json'
+    init.headers['Content-Type'] = 'application/json'
   }
 
   return new NextRequest(base, init)
