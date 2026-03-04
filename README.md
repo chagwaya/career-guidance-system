@@ -133,7 +133,6 @@ In the Render service **Environment** settings, add:
 | Variable | Value |
 |----------|-------|
 | `DATABASE_URL` | Your MySQL connection string, e.g. `mysql://USER:PASS@HOST:PORT/DB?sslaccept=strict` |
-| `NEXT_PUBLIC_APP_URL` | Your Render URL, e.g. `https://career-guidance-system.onrender.com` |
 
 The following are already set automatically by `render.yaml`:
 - `NODE_VERSION=22`
