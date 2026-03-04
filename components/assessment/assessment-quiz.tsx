@@ -15,25 +15,20 @@ import { cn } from '@/lib/utils'
 interface AssessmentQuizProps {
   questions: AssessmentQuestion[]
   answers: Record<number, string[]>
-  importance: Record<number, 1 | 2 | 3>
   onAnswer: (questionId: number, values: string[]) => void
-  onImportanceChange: (questionId: number, importance: 1 | 2 | 3) => void
   onSubmit: () => void
 }
 
 export function AssessmentQuiz({
   questions,
   answers,
-  importance,
   onAnswer,
-  onImportanceChange,
   onSubmit,
 }: AssessmentQuizProps) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [customAnswers, setCustomAnswers] = useState<Record<number, string>>({})
   const [showCustomInput, setShowCustomInput] = useState<Record<number, boolean>>({})
   const currentQuestion = questions[currentIndex]
-  const currentImportance = importance[currentQuestion.id] ?? 2
   const progress = ((Object.keys(answers).length) / questions.length) * 100
   const isLastQuestion = currentIndex === questions.length - 1
   const allAnswered = Object.keys(answers).length === questions.length
@@ -225,39 +220,6 @@ export function AssessmentQuiz({
                 <span className="text-foreground">None of the above — I&apos;ll type my own answer</span>
               </Label>
             </div>
-          </div>
-
-          <div className="space-y-2 border-t border-border pt-4">
-            <Label className="text-sm font-medium">How important is this question to you?</Label>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                size="sm"
-                variant={currentImportance === 1 ? 'default' : 'outline'}
-                onClick={() => onImportanceChange(currentQuestion.id, 1)}
-              >
-                Low
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant={currentImportance === 2 ? 'default' : 'outline'}
-                onClick={() => onImportanceChange(currentQuestion.id, 2)}
-              >
-                Medium
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant={currentImportance === 3 ? 'default' : 'outline'}
-                onClick={() => onImportanceChange(currentQuestion.id, 3)}
-              >
-                High
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Higher importance gives this response more influence in your personality and recommendation scoring.
-            </p>
           </div>
 
           {/* Custom Answer Section — only shown when "None of the above" is checked */}

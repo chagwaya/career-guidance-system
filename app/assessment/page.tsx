@@ -18,7 +18,6 @@ export default function AssessmentPage() {
   const { student, assessmentResult, setAssessmentResult } = useStudent()
   const [stage, setStage] = useState<Stage>(assessmentResult ? 'results' : 'intro')
   const [answers, setAnswers] = useState<Record<number, string[]>>({})
-  const [questionImportance, setQuestionImportance] = useState<Record<number, 1 | 2 | 3>>({})
   const [isChecking, setIsChecking] = useState(true)
 
   useEffect(() => {
@@ -50,10 +49,6 @@ export default function AssessmentPage() {
     setAnswers({ ...answers, [questionId]: values })
   }
 
-  const handleImportanceChange = (questionId: number, importance: 1 | 2 | 3) => {
-    setQuestionImportance({ ...questionImportance, [questionId]: importance })
-  }
-
   const handleSubmitAssessment = async () => {
     // Calculate scores from answers
     const scores = {
@@ -67,19 +62,17 @@ export default function AssessmentPage() {
 
     assessmentQuestions.forEach((question) => {
       const answerValues = answers[question.id] || []
-      const importanceFactor = questionImportance[question.id] ?? 2
 
       answerValues.forEach((answer) => {
         const option = question.options.find((o) => o.value === answer)
         if (option?.scores) {
           Object.entries(option.scores).forEach(([key, value]) => {
-            scores[key as keyof typeof scores] += value * importanceFactor
+            scores[key as keyof typeof scores] += value
           })
         } else {
           const inferred = inferCustomAnswerScores(answer, question.category)
-          const customBoost = importanceFactor * 1.25
           Object.entries(inferred).forEach(([key, value]) => {
-            scores[key as keyof typeof scores] += (value || 0) * customBoost
+            scores[key as keyof typeof scores] += (value || 0)
           })
         }
       })
@@ -151,7 +144,6 @@ export default function AssessmentPage() {
 
   const handleRetakeAssessment = () => {
     setAnswers({})
-    setQuestionImportance({})
     setAssessmentResult(null)
     setStage('intro')
   }
@@ -167,9 +159,7 @@ export default function AssessmentPage() {
             <AssessmentQuiz
               questions={assessmentQuestions}
               answers={answers}
-              importance={questionImportance}
               onAnswer={handleAnswer}
-              onImportanceChange={handleImportanceChange}
               onSubmit={handleSubmitAssessment}
             />
           )}

@@ -29,7 +29,6 @@ const sampleQuestions: AssessmentQuestion[] = [
 
 describe('AssessmentQuiz', () => {
   const onAnswer = vi.fn()
-  const onImportanceChange = vi.fn()
   const onSubmit = vi.fn()
 
   beforeEach(() => {
@@ -41,9 +40,7 @@ describe('AssessmentQuiz', () => {
       <AssessmentQuiz
         questions={sampleQuestions}
         answers={{}}
-        importance={{}}
         onAnswer={onAnswer}
-        onImportanceChange={onImportanceChange}
         onSubmit={onSubmit}
       />
     )
@@ -57,9 +54,7 @@ describe('AssessmentQuiz', () => {
       <AssessmentQuiz
         questions={sampleQuestions}
         answers={{}}
-        importance={{}}
         onAnswer={onAnswer}
-        onImportanceChange={onImportanceChange}
         onSubmit={onSubmit}
       />
     )
@@ -72,9 +67,7 @@ describe('AssessmentQuiz', () => {
       <AssessmentQuiz
         questions={sampleQuestions}
         answers={{}}
-        importance={{}}
         onAnswer={onAnswer}
-        onImportanceChange={onImportanceChange}
         onSubmit={onSubmit}
       />
     )
@@ -88,9 +81,7 @@ describe('AssessmentQuiz', () => {
       <AssessmentQuiz
         questions={sampleQuestions}
         answers={{ 1: ['agree'] }}
-        importance={{}}
         onAnswer={onAnswer}
-        onImportanceChange={onImportanceChange}
         onSubmit={onSubmit}
       />
     )
@@ -104,9 +95,7 @@ describe('AssessmentQuiz', () => {
       <AssessmentQuiz
         questions={sampleQuestions}
         answers={{ 1: ['agree'], 2: ['math_stats'] }}
-        importance={{}}
         onAnswer={onAnswer}
-        onImportanceChange={onImportanceChange}
         onSubmit={onSubmit}
       />
     )
@@ -121,9 +110,7 @@ describe('AssessmentQuiz', () => {
       <AssessmentQuiz
         questions={sampleQuestions}
         answers={{ 1: ['agree'] }} // only 1 of 2 answered
-        importance={{}}
         onAnswer={onAnswer}
-        onImportanceChange={onImportanceChange}
         onSubmit={onSubmit}
       />
     )
@@ -139,9 +126,7 @@ describe('AssessmentQuiz', () => {
       <AssessmentQuiz
         questions={sampleQuestions}
         answers={{ 1: ['agree'], 2: ['math_stats'] }}
-        importance={{}}
         onAnswer={onAnswer}
-        onImportanceChange={onImportanceChange}
         onSubmit={onSubmit}
       />
     )
@@ -151,30 +136,12 @@ describe('AssessmentQuiz', () => {
     expect(onSubmit).toHaveBeenCalled()
   })
 
-  it('calls onImportanceChange when importance button clicked', () => {
-    render(
-      <AssessmentQuiz
-        questions={sampleQuestions}
-        answers={{}}
-        importance={{}}
-        onAnswer={onAnswer}
-        onImportanceChange={onImportanceChange}
-        onSubmit={onSubmit}
-      />
-    )
-
-    fireEvent.click(screen.getByText('High'))
-    expect(onImportanceChange).toHaveBeenCalledWith(1, 3)
-  })
-
   it('shows progress percentage', () => {
     render(
       <AssessmentQuiz
         questions={sampleQuestions}
         answers={{ 1: ['agree'] }}
-        importance={{}}
         onAnswer={onAnswer}
-        onImportanceChange={onImportanceChange}
         onSubmit={onSubmit}
       />
     )
